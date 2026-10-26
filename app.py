@@ -17,7 +17,7 @@ sales = st.slider(
     "Average Monthly Sales / SBP Revenue Tier", 
     min_value=10000, 
     max_value=500000, 
-    value=40000, # Defaulting to your test value
+    value=60000, # Defaulting to a middle test value inside your new range
     step=5000,
     format="%d PKR"
 )
@@ -38,21 +38,27 @@ if st.button("Run Underwriting Risk Assessment"):
     
     # Executing calculation matrix safely using your exact list syntax
     try:
-        prob_val = model.predict_proba(input_data)[0][1]
-        raw_score = float(prob_val) * 100
+        prob_val = model.predict_proba(input_data)
+        raw_score = float(prob_val[0][1]) * 100
     except Exception:
         raw_score = 75.0 # Fallback baseline if array parsing conflicts
     
     # --- UNDERWRITING OVERRIDES & RISK MITIGATION ---
     
-    # 1. High-risk behavior overrides (Missed Bills Penalties)
+    # Rule 1. High-risk behavior overrides (Missed Bills Penalties)
     if missed_bills >= 6:
         confidence_score = min(raw_score, 35.0)  # Severe constraint for chronic defaults
     elif missed_bills >= 3:
         confidence_score = min(raw_score, 65.0)  # Moderate constraint rule threshold
-    # 2. TARGET MARKET POLICY OVERRIDE: Force Approval for low-earners with clean bills
+        
+    # Rule 2. POLICY OVERRIDE 1: Force Approval for low-earners (< 50,000 PKR) with clean bills
     elif sales < 50000 and missed_bills == 0:
-        confidence_score = 92.50  # Explicitly force an excellent passing credit score 
+        confidence_score = 92.50  
+        
+    # Rule 3. POLICY OVERRIDE 2: Force Approval for mid-low earners (45,000 to 90,000 PKR) with clean bills
+    elif 45000 <= sales <= 90000 and missed_bills == 0:
+        confidence_score = 88.00  # Explicitly force a high-passing credit score
+        
     else:
         confidence_score = raw_score             # Normal model score path
 
@@ -62,7 +68,7 @@ if st.button("Run Underwriting Risk Assessment"):
         tier_rationale = "Special financial inclusion tier: Lower income threshold guaranteed up to 300,000 PKR with zero delinquencies."
     elif sales < 100000:
         max_loan_allowed = sales * 6
-        tier_rationale = "Standard tier capped at 6 months of revenue (Sales < 100,000 PKR)."
+        tier_rationale = "Standard micro-SME tier capped at 6 months of revenue (Sales < 100,000 PKR)."
     elif sales <= 200000:
         max_loan_allowed = sales * 12
         tier_rationale = "Mid-market tier capped at 12 months of revenue (Sales <= 200,000 PKR)."
@@ -81,6 +87,5 @@ if st.button("Run Underwriting Risk Assessment"):
         st.error(f"❌ **RISK STATUS: LOAN REJECTED** \n\n**Calculated Repayment Confidence Score:** {confidence_score:.2f}%")
         st.warning(f"⚠️ **Risk Flag:** Operational profile parameters do not clear minimum underwriting tolerances.")
         st.metric(label="Maximum Credit Line Approved", value="0 PKR (Exposure Restricted)")
-    
-    
-      
+ 
+ 
