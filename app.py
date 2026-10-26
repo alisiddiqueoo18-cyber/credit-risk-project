@@ -14,7 +14,7 @@ st.markdown("---")
 
 # 2. Financial Metrics Data Gathering Input Fields
 sales = st.slider(
-    "Average Monthly Sales / SBP Revenue Tier", 
+    "Average Monthly profit/Monthly salary", 
     min_value=10000, 
     max_value=500000, 
     value=60000, # Defaulting to a middle test value inside your new range
