@@ -71,7 +71,7 @@ if st.button("Run Underwriting Risk Assessment"):
         tier_rationale = "Standard micro-SME tier capped at 6 months of revenue (Sales < 100,000 PKR)."
     elif sales <= 200000:
         max_loan_allowed = sales * 12
-        tier_rationale = "Mid-market tier capped at 12 months of revenue (Sales <= 200,000 PKR)."
+        tier_rationale = "Mid-market tier capped at 12 months of profit/salary (profit/monthly income <= 200,000 PKR)."
     else: # 3 Lac+ category
         max_loan_allowed = 10000000 # 1 Crore PKR limit
         tier_rationale = "Premium tier qualification (Sales > 200,000 PKR). Maximum line ceiling extended up to 1 Crore PKR."
