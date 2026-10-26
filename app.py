@@ -16,7 +16,7 @@ sales = st.slider(
     max_value=500000, 
     value=50000, 
     step=5000,
-    format="%d PKR" # This adds commas and the local currency suffix automatically
+    format="%d PKR"
 )
 
 missed_bills = st.slider(
@@ -32,16 +32,20 @@ if st.button("Assess Credit Eligibility"):
     
     # Get raw model outputs
     prediction = model.predict(input_data)
-    prob_val = model.predict_proba(input_data)[0][1] # Keeps your exact array index logic
-    confidence_score = prob_val * 100
+    prob_val = model.predict_proba(input_data) 
+    
+    # Crucial Fix: Safely extract the plain number from the model's array structure
+    confidence_score = float(prob_val[0][1]) * 100
     
     # Financial Rule Safeguard: High-risk behavior overrides
     if missed_bills >= 6:
         # Forces a low score and direct rejection for missing half a year or more of utility bills
-        confidence_score = min(confidence_score, 35.0)
+        if confidence_score > 35.0:
+            confidence_score = 35.0
     elif missed_bills >= 3:
         # Forces a borderline score for multiple missed bills
-        confidence_score = min(confidence_score, 65.0)
+        if confidence_score > 65.0:
+            confidence_score = 65.0
 
     st.subheader("Evaluation Results")
     
@@ -52,3 +56,5 @@ if st.button("Assess Credit Eligibility"):
     else:
         st.error(f"❌ LOAN REJECTED \n\n**Repayment Confidence Score:** {confidence_score:.2f}%")
         st.warning("⚠️ **Risk Factor:** High number of missed utility payments indicates elevated credit risk.")
+
+   
