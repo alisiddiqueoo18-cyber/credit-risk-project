@@ -8,7 +8,7 @@ with open('credit_model.pkl', 'rb') as file:
 
 # Professional Header Presentation
 st.title("🛡️ AI Micro-Lending Underwriting Engine")
-st.write("Alternative credit scoring mechanism for unbanked small business enterprises (SMEs).")
+st.write("Alternative credit scoring mechanism for unbanked small business enterprises (SMEs)/salaried proffesionals.")
 
 st.markdown("---")
 
